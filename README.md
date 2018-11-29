@@ -8,11 +8,13 @@ CIFAR-10: http://www.cs.toronto.edu/~kriz/cifar.html
 
 ## Setup
 
-install python3 on a linux machine or VM
+install python3 on a linux machine or VM. Then do:
 
-	>> python3 pip install -r requirements.txt
+	user@ubuntu:~/ImageClassification-withDeepLearning$ sudo apt install python3-pip
 
+	user@ubuntu:~/ImageClassification-withDeepLearning$ sudo pip3 install http://download.pytorch.org/whl/cpu/torch-0.4.1-cp35-cp35m-linux_x86_64.whl
 
+	user@ubuntu:~/ImageClassification-withDeepLearning$ sudo pip3 install -r requirements.txt
 
 ## How to Run
 
