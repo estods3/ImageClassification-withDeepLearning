@@ -62,9 +62,8 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 tbWidth = 50
 tbUpFreq = (trainloader.__len__() * numEpochs) / tbWidth
-print("updating bar every ", tbUpFreq)
 print("\tTraining on", numEpochs, "Epochs")
-sys.stdout.write("[%s]" % (" " * tbWidth))
+sys.stdout.write("\t[%s]" % (" " * tbWidth))
 sys.stdout.flush()
 sys.stdout.write("\b" * (tbWidth+1)) # return to start of line, after '['
 for epoch in range(numEpochs):  # loop over the dataset multiple times
@@ -90,7 +89,7 @@ for epoch in range(numEpochs):  # loop over the dataset multiple times
             sys.stdout.flush()
             #print('[%d, %5d] loss: %.3f' %(epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
-print(' 100%')
+print('] 100%')
 
 #########################################################################
 #				TEST NETWORK				#
