@@ -16,12 +16,16 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 
 transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.ToTensor()])
 
+print("Loading CIFAR-10 Training Set")
+print("\t", end ="")
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=4, shuffle=True, num_workers=2)
-print("Size of Training Set: " + str(trainset.__len__()))
+print("\tSize of Training Set: " + str(trainset.__len__()))
+print("Loading CIFAR-10 Testing Set")
+print("\t", end="")
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=False, num_workers=2)
-print("Size of Testing Set: " + str(testset.__len__()))
+print("\tSize of Testing Set: " + str(testset.__len__()))
 
 #########################################################################
 #			INITIALIZE NEURAL NETWORK		        #
@@ -59,7 +63,7 @@ for epoch in range(numEpochs):  # loop over the dataset multiple times
 
         # get the inputs
         inputs, labels = data
-        print(data[1].size())
+
         # zero the parameter gradients
         optimizer.zero_grad()
 
