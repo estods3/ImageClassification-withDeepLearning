@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 import numpy as np
-import os, sys
+import os, sys, time
 
 numEpochs = 2
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
@@ -16,12 +16,12 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 
 transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.ToTensor()])
 
-print("Loading CIFAR-10 Training Set")
-print("\t", end ="")
+print("\nLoading CIFAR-10 Training Set")
+print("\t", end="")
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=4, shuffle=True, num_workers=2)
 print("\tSize of Training Set: " + str(trainset.__len__()))
-print("Loading CIFAR-10 Testing Set")
+print("\nLoading CIFAR-10 Testing Set")
 print("\t", end="")
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=False, num_workers=2)
@@ -50,13 +50,23 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
+print("\nCreating Network")
 net = Net()
+print("\twith Loss and Optimizer")
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 #########################################################################
 #			   TRAIN NETWORK				#
 #########################################################################
+
+tbWidth = 50
+tbUpFreq = (trainloader.__len__() * numEpochs) / tbWidth
+print("updating bar every ", tbUpFreq)
+print("\tTraining on", numEpochs, "Epochs")
+sys.stdout.write("[%s]" % (" " * tbWidth))
+sys.stdout.flush()
+sys.stdout.write("\b" * (tbWidth+1)) # return to start of line, after '['
 for epoch in range(numEpochs):  # loop over the dataset multiple times
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
@@ -73,19 +83,18 @@ for epoch in range(numEpochs):  # loop over the dataset multiple times
         loss.backward()
         optimizer.step()
 
-        # print statistics
+        # update loading bar
         running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
+        if i % (tbUpFreq) == 1:
+            sys.stdout.write("#")
+            sys.stdout.flush()
+            #print('[%d, %5d] loss: %.3f' %(epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
+print(' 100%')
 
-print('Finished Training')
 #########################################################################
 #				TEST NETWORK				#
 #########################################################################
+
 dataiter = iter(testloader)
 images, labels = dataiter.next()
-
-# print images
-print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
