@@ -5,10 +5,10 @@ import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 import numpy as np
-import os, sys, time
+import os, sys, time, pickle
 
 numEpochs = 2
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+classesOfInterest = ('airplane', 'automobile', 'deer', 'dog')
 
 #########################################################################
 #				LOAD DATA			        #
@@ -26,7 +26,16 @@ print("\t", end="")
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=False, num_workers=2)
 print("\tSize of Testing Set: " + str(testset.__len__()))
-
+filename="./data/cifar-10-batches-py/batches.meta"
+with open(filename, mode='rb') as file:
+        # In Python 3.X it is important to set the encoding,
+        # otherwise an exception is raised here.
+        data = pickle.load(file, encoding='bytes')[b'label_names']
+names = [x.decode('utf-8') for x in data]
+coiIndices = []
+for c in classesOfInterest:
+	if(c in names):
+		coiIndices.append(names.index(c))
 #########################################################################
 #			INITIALIZE NEURAL NETWORK		        #
 #########################################################################
@@ -97,3 +106,39 @@ print('] 100%')
 
 dataiter = iter(testloader)
 images, labels = dataiter.next()
+
+outputs = net(images)
+
+_, predicted = torch.max(outputs, 1)
+
+print('Predicted: ', ' '.join('%5s' % classes[predicted[j]] for j in range(4)))
+
+correct = 0
+total = 0
+with torch.no_grad():
+    for data in testloader:
+        images, labels = data
+        outputs = net(images)
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+print('Accuracy of the network on the 10000 test images: %d %%' % (100 * correct / total))
+
+class_correct = list(0. for i in range(10))
+class_total = list(0. for i in range(10))
+with torch.no_grad():
+    for data in testloader:
+        images, labels = data
+        outputs = net(images)
+        _, predicted = torch.max(outputs, 1)
+        c = (predicted == labels).squeeze()
+        for i in range(4):
+            label = labels[i]
+            class_correct[label] += c[i].item()
+            class_total[label] += 1
+i = 0
+for classType in classesOfInterest:
+    ind = coiIndices(i)
+    print('Accuracy of %5s : %2d %%' % (classType, 100 * class_correct[ind] / class_total[ind]))
+    i = i + 1
