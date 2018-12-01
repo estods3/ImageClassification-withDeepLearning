@@ -43,16 +43,20 @@ for c in classesOfInterest:
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
+        self.conv1 = nn.Conv2d(1, 6, 3)
+        self.pool1 = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
+        #self.pool2 = nn.MaxPool2d(2, 2) 
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        #self.bn1 =
         self.fc2 = nn.Linear(120, 84)
+        #self.bn2 = 
         self.fc3 = nn.Linear(84, 10)
+        #self.bn3 = 
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.pool1(F.relu(self.conv1(x)))
+        x = self.pool1(F.relu(self.conv2(x)))
         x = x.view(-1, 16 * 5 * 5)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
@@ -61,8 +65,8 @@ class Net(nn.Module):
 
 print("\nCreating Network")
 net = Net()
-print("\twith Loss and Optimizer")
-#lossFunction = nn.MSELoss()
+print("\twith Loss Algorithm: MSELoss and Optimizer: Adam")
+#lossFunction = nn.Softmax(dim=0)
 lossFunction = nn.CrossEntropyLoss()
 optimizer = optim.Adam(net.parameters(), lr=0.001)
 #optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -83,17 +87,19 @@ for epoch in range(numEpochs):  # loop over the dataset multiple times
 
         # get the inputs
         inputs, labels = data
-
+        #labels = labels.float()
+        #labels = torch.tensor([labels,labels,labels,labels,labels,labels,labels,labels,labels,labels])
+        
         # zero the parameter gradients
         optimizer.zero_grad()
 
         # forward + backward + optimize
         outputs = net(inputs)
-        #print(labels)
-        #labels = labels.float()
-        #print(labels)
+        print(outputs.shape)
+        print(outputs.dim())
         loss = lossFunction(outputs, labels)
         loss.backward()
+        #todo add batch normalization
         optimizer.step()
 
         # update loading bar
