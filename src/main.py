@@ -31,11 +31,11 @@ with open(filename, mode='rb') as file:
         # In Python 3.X it is important to set the encoding,
         # otherwise an exception is raised here.
         data = pickle.load(file, encoding='bytes')[b'label_names']
-names = [x.decode('utf-8') for x in data]
+classes = [x.decode('utf-8') for x in data]
 coiIndices = []
 for c in classesOfInterest:
-	if(c in names):
-		coiIndices.append(names.index(c))
+	if(c in classes):
+		coiIndices.append(classes.index(c))
 #########################################################################
 #			INITIALIZE NEURAL NETWORK		        #
 #########################################################################
@@ -62,8 +62,10 @@ class Net(nn.Module):
 print("\nCreating Network")
 net = Net()
 print("\twith Loss and Optimizer")
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+#lossFunction = nn.MSELoss()
+lossFunction = nn.CrossEntropyLoss()
+optimizer = optim.Adam(net.parameters(), lr=0.001)
+#optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 #########################################################################
 #			   TRAIN NETWORK				#
@@ -87,16 +89,20 @@ for epoch in range(numEpochs):  # loop over the dataset multiple times
 
         # forward + backward + optimize
         outputs = net(inputs)
-        loss = criterion(outputs, labels)
+        #print(labels)
+        #labels = labels.float()
+        #print(labels)
+        loss = lossFunction(outputs, labels)
         loss.backward()
         optimizer.step()
 
         # update loading bar
         running_loss += loss.item()
         if i % (tbUpFreq) == 1:
-            sys.stdout.write("#")
+            sys.stdout.write("-")
+            sys.stdout.write('{0:.2f}'.format(running_loss / tbUpFreq))
             sys.stdout.flush()
-            #print('[%d, %5d] loss: %.3f' %(epoch + 1, i + 1, running_loss / 2000))
+            sys.stdout.write("\b\b\b\b")
             running_loss = 0.0
 print('] 100%')
 
@@ -139,6 +145,6 @@ with torch.no_grad():
             class_total[label] += 1
 i = 0
 for classType in classesOfInterest:
-    ind = coiIndices(i)
+    ind = coiIndices[i]
     print('Accuracy of %5s : %2d %%' % (classType, 100 * class_correct[ind] / class_total[ind]))
     i = i + 1
