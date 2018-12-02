@@ -1,7 +1,7 @@
 # Image Classification using Deep Learning
 Created an image classification algorithm using a deep neural network.
 NN uses the PyTorch Deep Learning Framework. It was trained on the CIFAR-10 database
-for the following objects: Airplane, Automobile, Deer, and Dog
+for the following objects: Airplane, Automobile, Deer, and Dog.
 
 ## Database
 CIFAR-10: http://www.cs.toronto.edu/~kriz/cifar.html
@@ -18,7 +18,7 @@ install python3 on a linux machine or VM. Then do:
 
 ## How to Run
 
-	user@ubuntu:~/ImageClassification-withDeepLearning$ python3 main.py
+	user@ubuntu:~/ImageClassification-withDeepLearning$ python3 src/main.py
 
 ## References
 Learning Multiple Layers of Features from Tiny Images, Alex Krizhevsky, 2009.
