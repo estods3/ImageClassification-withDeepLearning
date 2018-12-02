@@ -52,7 +52,7 @@ class Net(nn.Module):
         self.fc2 = nn.Linear(120, 84)
         self.bn2 = nn.BatchNorm1d(num_features=84)
         self.fc3 = nn.Linear(84, 10)
-        self.bn3 = nn.BatchNorm1d(10)
+        #self.bn3 = nn.BatchNorm1d(num_features=10)
 
     def forward(self, x):
         x = self.pool1(F.relu(self.conv1(x)))
@@ -63,16 +63,16 @@ class Net(nn.Module):
         x = F.relu((self.fc2(x)))
         x = self.bn2(x)
         x = self.fc3(x)
-        x = self.bn3(x)
+        #x = self.bn3(x)
         return x
 
 print("\nCreating Network")
 net = Net()
 print("\twith Loss Algorithm: MSELoss and Optimizer: Adam")
 #lossFunction = nn.Softmax(dim=0)
-lossFunction = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters(), lr=0.001)
-#optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+#lossFunction = nn.CrossEntropyLoss()
+lossFunction = nn.MSELoss()
+optimizer = optim.Adam(net.parameters(), lr=0.0001)
 
 #########################################################################
 #			   TRAIN NETWORK				#
@@ -98,7 +98,11 @@ for epoch in range(numEpochs):
 
         # forward + backward + optimize
         outputs = net(inputs)
-        loss = lossFunction(outputs, labels)
+        a = labels.numpy()
+        groundTruth = np.zeros((4,10))
+        groundTruth[np.arange(4), a] = 1
+        groundTruth = torch.from_numpy(groundTruth)
+        loss = lossFunction(outputs, groundTruth.float())
         loss.backward()
         optimizer.step()
 
