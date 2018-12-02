@@ -69,8 +69,6 @@ class Net(nn.Module):
 print("\nCreating Network")
 net = Net()
 print("\twith Loss Algorithm: MSELoss and Optimizer: Adam")
-#lossFunction = nn.Softmax(dim=0)
-#lossFunction = nn.CrossEntropyLoss()
 lossFunction = nn.MSELoss()
 optimizer = optim.Adam(net.parameters(), lr=0.0001)
 
@@ -90,8 +88,6 @@ for epoch in range(numEpochs):
 
         # get the inputs
         inputs, labels = data
-        #labels = labels.float()
-        #labels = torch.tensor([labels,labels,labels,labels,labels,labels,labels,labels,labels,labels])
         
         # zero the parameter gradients
         optimizer.zero_grad()
@@ -120,11 +116,6 @@ print('] 100%')
 #				TEST NETWORK				#
 #########################################################################
 
-dataiter = iter(testloader)
-images, labels = dataiter.next()
-outputs = net(images)
-_, predicted = torch.max(outputs, 1)
-
 correct = 0
 total = 0
 with torch.no_grad():
@@ -140,6 +131,7 @@ print('\tAccuracy of the network on the 10000 test images: %d %%' % (100 * corre
 
 class_correct = list(0. for i in range(10))
 class_total = list(0. for i in range(10))
+confusionMatrix = np.zeros((10,10))
 with torch.no_grad():
     for data in testloader:
         images, labels = data
@@ -149,9 +141,14 @@ with torch.no_grad():
         for i in range(4):
             label = labels[i]
             class_correct[label] += c[i].item()
+            confusionMatrix[label, predicted[i]] += 1
             class_total[label] += 1
+
 i = 0
 for classType in classesOfInterest:
     ind = coiIndices[i]
-    print('\tAccuracy of %5s : %2d %%' % (classType, 100 * class_correct[ind] / class_total[ind]))
+    acc = 100 * class_correct[ind] / class_total[ind]
+    hr = confusionMatrix[ind, ind]/(1000.0)
+    ms = (1000-confusionMatrix[ind, ind])/1000.0
+    print('\t%5s : Accuracy: %2d%% hit-rate: %0.2f miss-rate: %0.2f' % (classType, acc, hr, ms))
     i = i + 1
