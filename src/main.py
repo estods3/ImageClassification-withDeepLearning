@@ -43,24 +43,27 @@ for c in classesOfInterest:
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 3)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5, stride=1, padding=0)
         self.pool1 = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        #self.pool2 = nn.MaxPool2d(2, 2) 
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        #self.bn1 =
+        self.conv2 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=5, stride=1, padding=0)
+        self.pool2 = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(16*5*5, 120)
+        self.bn1 = nn.BatchNorm1d(num_features=120)
         self.fc2 = nn.Linear(120, 84)
-        #self.bn2 = 
+        self.bn2 = nn.BatchNorm1d(num_features=84)
         self.fc3 = nn.Linear(84, 10)
-        #self.bn3 = 
+        self.bn3 = nn.BatchNorm1d(10)
 
     def forward(self, x):
         x = self.pool1(F.relu(self.conv1(x)))
-        x = self.pool1(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        x = self.pool2(F.relu(self.conv2(x)))
+        x = x.view(-1, 16*5*5)
+        x = F.relu((self.fc1(x)))
+        x = self.bn1(x)
+        x = F.relu((self.fc2(x)))
+        x = self.bn2(x)
         x = self.fc3(x)
+        x = self.bn3(x)
         return x
 
 print("\nCreating Network")
@@ -81,7 +84,7 @@ print("\tTraining on", numEpochs, "Epochs")
 sys.stdout.write("\t[%s]" % (" " * tbWidth))
 sys.stdout.flush()
 sys.stdout.write("\b" * (tbWidth+1)) # return to start of line, after '['
-for epoch in range(numEpochs):  # loop over the dataset multiple times
+for epoch in range(numEpochs):
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
 
@@ -95,11 +98,8 @@ for epoch in range(numEpochs):  # loop over the dataset multiple times
 
         # forward + backward + optimize
         outputs = net(inputs)
-        print(outputs.shape)
-        print(outputs.dim())
         loss = lossFunction(outputs, labels)
         loss.backward()
-        #todo add batch normalization
         optimizer.step()
 
         # update loading bar
