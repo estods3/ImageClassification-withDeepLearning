@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 import numpy as np
 import os, sys, time, pickle
 
-numEpochs = 2
+numEpochs = 5
 classesOfInterest = ('airplane', 'automobile', 'deer', 'dog')
 
 #########################################################################
