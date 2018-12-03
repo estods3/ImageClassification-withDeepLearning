@@ -80,6 +80,7 @@ print("\tTraining on", numEpochs, "Epochs")
 sys.stdout.write("\t[%s]" % (" " * tbWidth))
 sys.stdout.flush()
 sys.stdout.write("\b" * (tbWidth+1)) # return to start of line, after '['
+lossList = []
 for epoch in range(numEpochs):
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
@@ -107,6 +108,7 @@ for epoch in range(numEpochs):
             sys.stdout.write('{0:.2f}'.format(running_loss / tbUpFreq))
             sys.stdout.flush()
             sys.stdout.write("\b\b\b\b")
+            lossList.append(running_loss / tbUpFreq)
             running_loss = 0.0
 print('] 100%')
 
