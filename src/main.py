@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 import numpy as np
 import os, sys, time, pickle
 
-numEpochs = 5
+numEpochs = 10
 classesOfInterest = ('airplane', 'automobile', 'deer', 'dog')
 
 #########################################################################
@@ -44,26 +44,24 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5, stride=1, padding=0)
+        #self.cbn1 = nn.BatchNorm2d(num_features=6)
         self.pool1 = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=5, stride=1, padding=0)
+        #self.cbn2 = nn.BatchNorm2d(num_features=16)
         self.pool2 = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(16*5*5, 120)
         self.bn1 = nn.BatchNorm1d(num_features=120)
         self.fc2 = nn.Linear(120, 84)
         self.bn2 = nn.BatchNorm1d(num_features=84)
         self.fc3 = nn.Linear(84, 10)
-        #self.bn3 = nn.BatchNorm1d(num_features=10)
 
     def forward(self, x):
         x = self.pool1(F.relu(self.conv1(x)))
         x = self.pool2(F.relu(self.conv2(x)))
         x = x.view(-1, 16*5*5)
         x = F.relu(self.bn1(self.fc1(x)))
-        #x = self.bn1(x)
         x = F.relu(self.bn2(self.fc2(x)))
-        #x = self.bn2(x)
         x = self.fc3(x)
-        #x = self.bn3(x)
         return x
 
 print("\nCreating Network")
